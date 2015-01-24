@@ -1,0 +1,16 @@
+.eunit
+ebin
+deps
+*.o
+*.beam
+*.plt
+*~
+Mnesia.*
+log
+console.log
+error.log
+rel/onshin
+dev
+cscope.*
+erl_crash.dump
+onshin.ini

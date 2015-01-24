@@ -1,0 +1,29 @@
+body {
+  padding-top: 5px;
+}
+
+.list-group-item .list-group-item-heading {
+  color: #1474ee;
+  font-weight: bold;
+}
+
+.chat-logs {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 70%;
+  //border: solid 1px #aaaaaa;
+}
+
+.message-at {
+  float: right;
+  font-size: 0.9em;
+}
+
+.modal-profile {
+  width: 450px;
+}
+
+.checkbox label {
+  font-weight: bold;
+}
+

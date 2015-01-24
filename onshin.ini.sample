@@ -1,0 +1,12 @@
+; server to connect from client with http/websocket
+[server]
+host=127.0.0.1
+port=8080
+prefix=
+
+[smtp]
+host=127.0.0.1
+port=25
+subject=You got a message.
+from=mail@yourdomain.com
+site_url=http://yourdomain.com
