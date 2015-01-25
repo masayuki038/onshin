@@ -11,7 +11,7 @@
   <title>onshin</title>
 </head>
 <body ng-app="app">
-  <div class="container" ng-controller="ChatCtrl">
+  <div class="container-fluid" ng-controller="ChatCtrl">
     <div class="navbar navbar-inverse">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
@@ -22,39 +22,37 @@
         <a class="navbar-brand" href="#">onshin</a>
       </div>
     </div>
-    <div class="chat-box-panel">
-      <div class="row">
+    <div class="sidebar">
+      members
+      <div class="list-group">
+        <a href="#" class="list-group-item" ng-repeat="state in states" ng-click="set_mention(state.member)">
+          <span ng-if="state.joined" class="label label-success">online</span>
+          <span ng-if="!state.joined" class="label label-default">offline</span>
+          <span class="list-group-item-heading">{{state.member}}</span>
+        </a>
+      </div>
+    </div>
+    <div class="content">
+      <div id="main" class="chat-logs">
+        <div class="list-group">
+          <span class="list-group-item" ng-repeat="message in messages">
+            <div>
+              <span class="list-group-item-heading" style="overflow: hidden">{{message.user}}</span>
+              <span class="message-at">{{message.at}}</span>
+            </div>
+            <p class="list-group-item-text" ng-bind-html="message.message | sanitize | convert_linefeed"></p>
+          </span>
+        </div>
+      </div>
+      <div class="chat-box-panel">
         <form>
-          <div class="col-lg-12">
+          <div>
             <span ng-init="start('ws://$host$:$port$$prefix$/websocket')">
               <textarea class="form-control" rows="3" id="chat-box" ng-model="message" ng-enter="send_message(message); message = ''"></textarea>
             </span>
             <span class="help-block">Press Shift+Enter to send message.</span>
           </div>
         </form>
-      </div>
-    </div>
-    <div class="chat-logs">
- 	  <div class="row">
-        <div class="col-lg-8">
-          <div class="list-group">
-            <span class="list-group-item" ng-repeat="message in messages">
-              <div class="message-at">{{message.at}}</div>
-              <p class="list-group-item-heading" style="overflow: hidden">{{message.user}}</p>
-              <p class="list-group-item-text" ng-bind-html="message.message | sanitize | convert_linefeed"></p>
-            </span>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          members
-          <div class="list-group">
-            <a href="#" class="list-group-item" ng-repeat="state in states" ng-click="set_mention(state.member)">
-              <span ng-if="state.joined" class="label label-success">online</span>
-              <span ng-if="!state.joined" class="label label-default">offline</span>
-              <span class="list-group-item-heading">{{state.member}}</span>
-            </a>
-          </div>
-        </div>
       </div>
     </div>
     <div id="login_dialog" role="dialog" class="modal" ng-controller="LoginCtrl">

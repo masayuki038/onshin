@@ -2,9 +2,24 @@ body {
   padding-top: 5px;
 }
 
+.container-fluid > .sidebar {
+  float: left;
+  poisiton: fixed;
+  width: 220px;
+}
+.container-fluid > .content {
+  margin-left: 220px;
+}
+
+.list-group-item {
+  border: 0px;
+}
+
 .list-group-item .list-group-item-heading {
-  color: #1474ee;
+  color: #111111;
+  font-size: 1.1em;
   font-weight: bold;
+  margin-right: 5px;
 }
 
 .chat-logs {
@@ -14,8 +29,15 @@ body {
   //border: solid 1px #aaaaaa;
 }
 
+.chat-box-panel {
+  height: 150px;
+  margin-top: 30px;
+  bottom: 0px;
+  z-index: 1;
+}
+
 .message-at {
-  float: right;
+  color: #aaaaaa;
   font-size: 0.9em;
 }
 

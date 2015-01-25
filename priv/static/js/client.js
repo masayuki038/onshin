@@ -123,13 +123,17 @@ function ChatCtrl($scope, $sanitize, ChatService) {
 
   ChatService.on_message(function(data) {
     for(var i = 0; i < data.length; i++) {
-      $scope.messages.unshift(data[i]);
+      $scope.messages.push(data[i]);
     }
     if(!$scope.active) {
       $scope.unread += data.length;
       document.title = "onshin(" + $scope.unread + ")";
     }
     $scope.$apply();
+    var main = $('#main')[0];
+    if(main) {
+       main.scrollTop = main.scrollHeight;
+    }
   });
 
   ChatService.on_update_status(function(data) {
