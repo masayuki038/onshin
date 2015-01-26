@@ -1,4 +1,18 @@
+var scroll_down_chatlogs = function() {
+  var main = $('#main')[0];
+  if(main) {
+    $('#main').innerHeight(window.innerHeight - 60 - 210);
+    main.scrollTop = main.scrollHeight;
+  }
+}
+
 var app = angular.module('app', ['ngSanitize']);
+
+app.run(function() {
+  $(window).bind('resize', function(e){
+    scroll_down_chatlogs();
+  });
+});
 
 app.directive('ngEnter', function() {
   return function (scope, element, attrs) {
@@ -130,10 +144,7 @@ function ChatCtrl($scope, $sanitize, ChatService) {
       document.title = "onshin(" + $scope.unread + ")";
     }
     $scope.$apply();
-    var main = $('#main')[0];
-    if(main) {
-       main.scrollTop = main.scrollHeight;
-    }
+    scroll_down_chatlogs();
   });
 
   ChatService.on_update_status(function(data) {
