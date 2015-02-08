@@ -1,11 +1,19 @@
 body {
   padding-top: 5px;
+  margin-bottom: 5px;
+  overflow-y: hidden;
+}
+
+.container-fluid {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .container-fluid > .sidebar {
   float: left;
-  poisiton: fixed;
-  width: 220px;
+  width: 205px;
+  height: 100%;
+  background-color: #394b4d;
 }
 .container-fluid > .content {
   margin-left: 220px;
@@ -13,10 +21,18 @@ body {
 
 .list-group-item {
   border: 0px;
+  background-color: transparent;
+}
+
+a.list-group-item {
+  color: #9ba9ab;
+}
+
+a.list-group-item .list-group-item-heading {
+  color: #9ba9ab;
 }
 
 .list-group-item .list-group-item-heading {
-  color: #111111;
   font-size: 1.1em;
   font-weight: bold;
   margin-right: 5px;
@@ -25,8 +41,6 @@ body {
 .chat-logs {
   overflow-x: hidden;
   overflow-y: auto;
-  //height: 70%;
-  //border: solid 1px #aaaaaa;
 }
 
 .chat-box-panel {
@@ -49,3 +63,16 @@ body {
   font-weight: bold;
 }
 
+.navbar {
+  margin-left: 220px;
+  min-height: 40px;
+  height: 40px;
+  border-radius: 0px;
+  background-color: transparent;
+}
+
+.navbar-default .navbar-brand {
+  color: #111111;
+  height: 40px;
+  font-size: 24px;
+}

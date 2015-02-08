@@ -134,6 +134,11 @@ function ChatCtrl($scope, $sanitize, ChatService) {
   window.onfocus = function() {
     $scope.activate();
   }
+ 
+  $scope.start = function(uri) {
+    $scope.uri = uri;
+    ChatService.try_reconnect(uri, $scope.show_login_dialog);
+  }
 
   ChatService.on_message(function(data) {
     for(var i = 0; i < data.length; i++) {
@@ -151,11 +156,6 @@ function ChatCtrl($scope, $sanitize, ChatService) {
     $scope.states = data.states;
     $scope.$apply();
   });
-
-  $scope.start = function(uri) {
-    $scope.uri = uri;
-    ChatService.try_reconnect(uri, $scope.show_login_dialog);
-  }
 
   $scope.show_login_dialog = function() {
     $('#login_dialog').on('shown', function () {
