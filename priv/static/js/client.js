@@ -73,6 +73,24 @@ app.factory('ChatService', function() {
     service.server.send('send_message', obj);
   }
 
+  service.notify = function(data) {
+    if(!window.Notification) {
+      return;
+    }
+    if(Notification.permission) {
+      if(Notification.permission != "granted") {
+        Notification.requestPermission();
+      }
+    } else {
+      alert(new Notification("check").permission);
+    }
+
+    new Notification(data[0].user, {
+      body: data[0].message,
+      tag: 'onshin'
+    });
+  }
+
   service.login = function(mail, password, name, update) {
     var obj = {mail: mail, password: password, name: name, update: update};
     service.server.send('authenticate', obj);
@@ -147,6 +165,7 @@ function ChatCtrl($scope, $sanitize, ChatService) {
     if(!$scope.active) {
       $scope.unread += data.length;
       document.title = "onshin(" + $scope.unread + ")";
+      ChatService.notify(data);
     }
     $scope.$apply();
     scroll_down_chatlogs();
