@@ -1,7 +1,7 @@
 -module(storage).
 -compile(export_all).
 
--include("message.hrl").
+-include("onshin.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 
 clean_start(DbType) ->

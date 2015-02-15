@@ -1,4 +1,4 @@
--record(message, {message_id :: [integer()], content :: binary(), user :: binary(), at}).
+-record(message, {message_id :: [integer()], content :: binary(), user :: binary(), image_id: binary(), at}).
 -type message()::#message{}.
 
 -record(member, {mail :: binary(), password :: binary(), name :: binary(), token :: [integer()]}).

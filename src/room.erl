@@ -3,7 +3,7 @@
 -export([update_status/1]).
 -export([send_mail/3, convert_linefeed/1]).
 
--include("message.hrl").
+-include("onshin.hrl").
 
 loop(Clients) ->
     receive
