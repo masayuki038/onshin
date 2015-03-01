@@ -31,43 +31,50 @@ websocket_handle({text, Msg}, Req, State) ->
             room ! {message, {Content, User}};
         {[{<<"event">>, <<"authenticate">>}, {<<"data">>, Data}]} ->
             {[{<<"mail">>, Mail}, {<<"password">>, Password}, {<<"name">>, Name}, {<<"update">>, Update}]} = Data,
-            room ! {authenticate, {self(), #member{mail = Mail, password = Password, name = Name}, Update}};
+            lager:info("user_session: ~p~n", [whereis(user_session)]),
+            user_session ! {authenticate, {self(), #member{mail = Mail, password = Password, name = Name}, Update}};
         {[{<<"event">>, <<"reconnect">>}, {<<"data">>, {[{<<"mail">>, Mail}, {<<"token">>, Token}]}}]} ->
-            room ! {reconnect, {self(), Mail, Token}}
+            user_session ! {reconnect, {self(), Mail, Token}}
     end,
     {ok, Req, State}.
 
-websocket_info({publish, Messages}, Req, State) ->
+websocket_info({publish, Messages}, Req, Session) ->
     lager:info("websocket_info({publish, Messages}, Req, State)"),
     lager:info("Messages: ~p", [Messages]),
     Encoded = jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, to_binary_list(Messages)}]),
     lager:info("Encoded: ~p", [Encoded]),
-    {reply, {text, Encoded}, Req, State};
-websocket_info({authenticated, Member}, Req, State) ->
+    {reply, {text, Encoded}, Req, Session};
+websocket_info({authenticated, Session}, Req, _State) ->
+    Member = Session#session.member,
     lager:info("websocket_info({authenticated, Member}, Req, State)"),
     lager:info("Member: ~p", [Member]),
-    Encoded = jsonx:encode([{<<"event">>, <<"authenticated">>}, {<<"data">>, [{<<"token">>, Member#member.token}, {<<"mail">>, Member#member.mail}, {<<"name">>, Member#member.name}]}]),
+    %% todo don't send mail address
+    Encoded = jsonx:encode([{<<"event">>, <<"authenticated">>}, {<<"data">>, [{<<"token">>, Session#session.token}, {<<"mail">>, Member#member.mail}, {<<"name">>, Member#member.name}]}]),
     lager:info("Encoded: ~p", [Encoded]),
     room ! {join, {self(), Member#member.name}},
-    {reply, {text, Encoded}, Req, State};
+    {reply, {text, Encoded}, Req, Session};
 websocket_info({unauthenticated, Member}, Req, State) ->
     lager:info("websocket_info({unauthenticated, Member}, Req, State)"),
     lager:info("Member: ~p", [Member]),
     Encoded = jsonx:encode([{<<"event">>, <<"unauthenticated">>}, {<<"data">>, [{<<"error">>, <<"Authentication Failed">>}]}]),
     {reply, {text, Encoded}, Req, State};
-websocket_info({update_status, {EventType, Name}, States}, Req, State) ->
-    lager:info("websocket_info({update_status, Event, States}, Req, State)"),
+websocket_info({update_status, {EventType, Name}, States}, Req, Session) ->
+    lager:info("websocket_info({update_status, Event, States}, Req, Session)"),
     Deployed = lists:map(fun({Member, Joined}) -> [{<<"member">>, Member}, {<<"joined">>, Joined}] end, States),
     Encoded = jsonx:encode([{<<"event">>, <<"update_status">>}, {<<"data">>, [{<<"event_type">>, EventType}, {<<"name">>, Name}, {<<"states">>, Deployed}]}]),
     lager:info("Encoded: ~p", [Encoded]),
-    {reply, {text, Encoded}, Req, State};    
+    {reply, {text, Encoded}, Req, Session};    
 websocket_info(_Info, Req, State) ->    
     lager:info("websocket_info/3"),
     {ok, Req, State}.
     
-websocket_terminate(_Reason, _Req, _State) -> 
+websocket_terminate(_Reason, _Req, Session) -> 
     lager:info("websocket_terminate/3"),
     room ! {quit, self()},
+    case Session of
+        undefined_state -> ok;
+        _ -> user_session ! {quit, Session#session.token}
+    end,
     ok.
 
 to_binary_list(Messages) ->

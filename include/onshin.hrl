@@ -1,8 +1,11 @@
--record(message, {message_id :: [integer()], content :: binary(), user :: binary(), image_id: binary(), at}).
+-record(message, {message_id :: [integer()], content :: binary(), user :: binary(), at}).
 -type message()::#message{}.
 
--record(member, {mail :: binary(), password :: binary(), name :: binary(), token :: [integer()]}).
+-record(member, {mail :: binary(), password :: binary(), name :: binary()}).
 -type member()::#member{}.
+
+-record(session, {member :: member(), md5 :: binary(), token :: [integer()]}).
+-type session()::#session{}.
 
 -define(record_to_struct(RecordName, Record),
   {lists:zip(

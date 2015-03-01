@@ -11,6 +11,8 @@
 
 start(_StartType, _StartArgs) ->
     register(room, spawn(fun() -> room:loop([]) end)),
+    Ets = ets:new(sessions, [public]),
+    register(user_session, spawn(fun() -> user_session:loop(Ets) end)),
     storage:start(disc_copies),
     ok = bootstrap_cowboy(),
     onshin_sup:start_link().

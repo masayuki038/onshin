@@ -35,58 +35,6 @@ loop(Clients) ->
                 _ -> ok
             end, 
             loop(Clients);
-        {reconnect, {Pid, Mail, Token}} ->
-            lager:info("~p(~p) reconnected~n", [Mail, Token]),
-            case storage:get_member(Mail) of
-                {ok, Member} ->
-                    case Token =:= Member#member.token of
-                        true ->
-                            Updated = Member#member{
-                                token = storage:generate_member_token(Mail)
-                            },
-                            storage:update_member(Updated),
-                            Pid ! {authenticated, Updated};
-                        false ->
-                            Pid ! {unauthenticated, #member{mail = Mail, token = Token}}
-                    end;
-                _ ->
-                    Pid ! {unauthenticated, #member{mail = Mail, token = Token}}
-            end,            
-            loop(Clients);            
-        {authenticate, {Pid, Input, Update}} ->
-            #member{mail = Mail, password = Password, name = Name} = Input,
-            lager:info("~p try authentication~n", [Name]),
-            case check_parameters(Mail, Password, Name, Update) of
-                ng -> Pid ! {unauthenticated, Input};
-                ok ->
-                    case storage:get_member(Mail) of
-                        {ok, Member} ->
-                            %% password check
-                            #member{password = Password2} = Member,
-                            case  Password =:= Password2 of
-                                true -> 
-                                    Updated = Member#member{
-                                        token = storage:generate_member_token(Mail)
-                                    },
-                                    storage:update_member(Updated),
-                                    Pid ! {authenticated, Updated};
-                                false ->
-                                    Pid ! {unauthenticated, Input}
-                            end;
-                        {ng, _} ->
-                            case Update of 
-                                true -> 
-                                    Updated = Input#member{
-                                        token = storage:generate_member_token(Mail)
-                                    },
-                                    storage:update_member(Updated),
-                                    Pid ! {authenticated, Updated};
-                                _ ->
-                                    Pid ! {unauthenticated, Input}
-                            end
-                    end
-            end,
-            loop(Clients);
         {quit, Pid} ->
             lager:info("~p left~n", [Pid]),
             {NewClients, Removed} = lists:partition(
@@ -94,23 +42,6 @@ loop(Clients) ->
             ),
             lists:foreach(fun({_R, User}) -> ok = send_member_status({quit, User}, NewClients) end, Removed),
             loop(NewClients)
-    end.
-
-check_parameters(Mail, Password, Name, Update) ->
-    MailPasswordValid = {check_required(Mail), check_required(Password)},
-    case MailPasswordValid of
-        {ok, ok} -> 
-            case Update of
-                true -> check_required(Name);
-                _ -> ok
-            end;
-        {_, _} -> ng
-    end.
-
-check_required(Param) ->
-    case byte_size(Param) of
-        0 -> ng;
-        _ -> ok
     end.
 
 send_message(Clients, Content, User) ->
