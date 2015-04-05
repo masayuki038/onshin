@@ -41,7 +41,7 @@ websocket_handle({text, Msg}, Req, State) ->
 websocket_info({publish, Messages}, Req, Session) ->
     lager:info("websocket_info({publish, Messages}, Req, State)"),
     lager:info("Messages: ~p", [Messages]),
-    Encoded = jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, to_binary_list(Messages)}]),
+    Encoded = jsonx:encode([{<<"event">>, <<"message">>}, {<<"data">>, convert_to_json(Messages)}]),
     lager:info("Encoded: ~p", [Encoded]),
     {reply, {text, Encoded}, Req, Session};
 websocket_info({authenticated, Session}, Req, _State) ->
@@ -74,11 +74,11 @@ websocket_terminate(_Reason, _Req, _Session) ->
     room ! {quit, self()},
     ok.
 
-to_binary_list(Messages) ->
-    to_binary_list(Messages, []).
+convert_to_json(Messages) ->
+    convert_to_json(Messages, []).
 
-to_binary_list([Message | Messages], Ret) ->
+convert_to_json([Message | Messages], Ret) ->
     {message, _, Content, User, At} = Message,
-    to_binary_list(Messages, [{[{<<"message">>, Content}, {<<"user">>, User}, {<<"at">>, At}]} | Ret]);
-to_binary_list([], Ret) ->
+    convert_to_json(Messages, [{[{<<"message">>, list_to_binary(xmerl_lib:export_text(binary_to_list(Content)))}, {<<"user">>, User}, {<<"at">>, At}]} | Ret]);
+convert_to_json([], Ret) ->
     Ret.
