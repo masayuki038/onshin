@@ -39,10 +39,11 @@ loop(Ets) ->
             loop(Ets);
         {reconnect, {Pid, Mail, Token}} ->
             lager:info("~p(~p) reconnected~n", [Mail, Token]),
-            case etc:lookup(Ets, Token) of
-                [_, N] ->
+            lager:info("~p~n", [ets:lookup(Ets, Token)]),
+            case ets:lookup(Ets, Token) of
+                [{_, Session}] ->
                     lager:info("sessions: ~p~n", ets:tab2list(Ets)),
-                    Pid ! {authenticated, N};
+                    Pid ! {authenticated, Session};
                 [] ->
                     Pid ! {unauthenticated, #member{mail = Mail}}
             end,            

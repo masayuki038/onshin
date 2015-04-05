@@ -45,8 +45,9 @@ websocket_info({publish, Messages}, Req, Session) ->
     lager:info("Encoded: ~p", [Encoded]),
     {reply, {text, Encoded}, Req, Session};
 websocket_info({authenticated, Session}, Req, _State) ->
+    lager:info("websocket_info({authenticated, Session}, Req, State)"),
+    lager:info("Session: ~p~n", [Session]),
     Member = Session#session.member,
-    lager:info("websocket_info({authenticated, Member}, Req, State)"),
     lager:info("Member: ~p", [Member]),
     %% todo don't send mail address
     Encoded = jsonx:encode([{<<"event">>, <<"authenticated">>}, {<<"data">>, [{<<"token">>, Session#session.token}, {<<"mail">>, Member#member.mail}, {<<"name">>, Member#member.name}]}]),
@@ -68,13 +69,9 @@ websocket_info(_Info, Req, State) ->
     lager:info("websocket_info/3"),
     {ok, Req, State}.
     
-websocket_terminate(_Reason, _Req, Session) -> 
+websocket_terminate(_Reason, _Req, _Session) -> 
     lager:info("websocket_terminate/3"),
     room ! {quit, self()},
-    case Session of
-        undefined_state -> ok;
-        _ -> user_session ! {quit, Session#session.token}
-    end,
     ok.
 
 to_binary_list(Messages) ->
